@@ -1,0 +1,190 @@
+/*
+ * 시뮬레이션 수업 모음 화면의 모양. 시뮬레이션 교육 책(교육과정 칸의 작업실)과 같은 도면 느낌을 옮겼어요:
+ * 어두운 종이 · 은빛 글자 · 하늘빛 강조 · 모서리 꺾쇠 · 옅은 모눈 · 고정폭 숫자.
+ * 색은 도름스가 건네는 책 색(--paper · --ink · --ink-light · --border-light · --border-dark)을 먼저 쓰고,
+ * 도름스가 색을 주지 않을 때만 이 책의 기본 색(#0C1118 바탕)을 씁니다. 강조색 --sm-accent 는 dist/palette.js 가 종이에 맞춰 넣어요.
+ * 더 자세한 규칙은 레포의 design/README.md 에 있어요. 마음대로 바꿔도 되지만, 쌩 흰색(#fff)은 쓰지 마세요.
+ */
+:root {
+  --sm-paper: var(--paper, var(--book-paper, #0C1118));
+  --sm-ink: var(--ink, var(--book-body-ink, #E2E8F0));
+  --sm-muted: var(--ink-light, var(--book-muted, #AEB9C7));
+  --sm-line: var(--border-light, var(--book-rule, #45505E));
+  --sm-edge: var(--border-dark, #5B6879);
+  --sm-accent: #A7DAED;
+  --sm-raised: color-mix(in srgb, var(--sm-ink) 4%, var(--sm-paper));
+  --sm-soft: color-mix(in srgb, var(--sm-ink) 8%, var(--sm-paper));
+  --sm-grid: color-mix(in srgb, var(--sm-ink) 6%, transparent);
+  --sm-sans: "SUIT Variable", "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", "Malgun Gothic", system-ui, sans-serif;
+  --sm-mono: "Space Mono", ui-monospace, "SF Mono", "Menlo", "Consolas", monospace;
+  color-scheme: dark;
+}
+* { box-sizing: border-box; }
+/* display 를 준 요소도 hidden 이면 확실히 숨긴다. */
+[hidden] { display: none !important; }
+html, body { margin: 0; padding: 0; background: var(--sm-paper); color: var(--sm-ink); }
+body {
+  font-family: var(--sm-sans);
+  font-size: 16px;
+  line-height: 1.6;
+  word-break: keep-all;
+  overflow-wrap: break-word;
+}
+button, input, select, textarea { font: inherit; color: inherit; }
+button { cursor: pointer; }
+button:disabled { cursor: not-allowed; opacity: 0.5; }
+:focus-visible { outline: 3px solid var(--sm-accent); outline-offset: 3px; }
+::selection { background: color-mix(in srgb, var(--sm-accent) 30%, var(--sm-paper)); color: var(--sm-ink); }
+
+.sm-page { display: flex; flex-direction: column; gap: 22px; padding: 4px 2px 20px; }
+.sm-state { margin: 0; padding: 24px 0; color: var(--sm-muted); }
+.sm-state > p { margin: 0 0 10px; }
+
+/* ── 머리: 모눈 위 제목 · 한 줄 · 계기판 숫자 · 도구. 네 모서리에 꺾쇠 ── */
+.sm-head {
+  position: relative; isolation: isolate; overflow: hidden;
+  display: flex; flex-direction: column; gap: 18px;
+  padding: 22px 20px 18px;
+  border: 1px solid var(--sm-line); border-radius: 2px;
+  background-color: var(--sm-raised);
+  background-image: linear-gradient(var(--sm-grid) 1px, transparent 1px), linear-gradient(90deg, var(--sm-grid) 1px, transparent 1px);
+  background-size: 24px 24px;
+  background-position: -1px -1px;
+}
+.sm-head::before, .sm-head::after {
+  content: ""; position: absolute; inset: 0; pointer-events: none;
+  background:
+    linear-gradient(var(--sm-ink), var(--sm-ink)) left top / 16px 2px no-repeat,
+    linear-gradient(var(--sm-ink), var(--sm-ink)) right top / 16px 2px no-repeat,
+    linear-gradient(var(--sm-ink), var(--sm-ink)) left bottom / 16px 2px no-repeat,
+    linear-gradient(var(--sm-ink), var(--sm-ink)) right bottom / 16px 2px no-repeat;
+}
+.sm-head::after {
+  background:
+    linear-gradient(var(--sm-ink), var(--sm-ink)) left top / 2px 16px no-repeat,
+    linear-gradient(var(--sm-ink), var(--sm-ink)) right top / 2px 16px no-repeat,
+    linear-gradient(var(--sm-ink), var(--sm-ink)) left bottom / 2px 16px no-repeat,
+    linear-gradient(var(--sm-ink), var(--sm-ink)) right bottom / 2px 16px no-repeat;
+}
+.sm-diagram { position: absolute; z-index: -1; top: -26px; right: -22px; width: 190px; height: 190px; color: var(--sm-ink); opacity: 0.22; }
+.sm-diagram-dot { color: var(--sm-accent); fill: var(--sm-accent); }
+.sm-titles { min-width: 0; max-width: 34em; }
+.sm-title { margin: 0; font-size: 28px; font-weight: 800; line-height: 1.3; letter-spacing: -0.04em; }
+.sm-lead { margin: 6px 0 0; color: var(--sm-muted); font-size: 15px; line-height: 1.6; }
+.sm-head-foot { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 16px; }
+.sm-readouts { display: flex; gap: 8px; margin-right: auto; }
+.sm-readout {
+  margin: 0; display: inline-flex; align-items: baseline; gap: 8px;
+  min-height: 44px; padding: 8px 12px;
+  border: 1px solid var(--sm-line); border-radius: 2px; background: var(--sm-paper);
+}
+.sm-readout-label { color: var(--sm-muted); font-size: 13px; font-weight: 650; }
+.sm-readout-number { font-family: var(--sm-mono); font-size: 20px; font-weight: 700; line-height: 1.2; color: var(--sm-accent); font-variant-numeric: tabular-nums; }
+
+/* ── 단추: 2px 모서리 · 높이 44px 이상 · 테두리 · 강조는 글자색 바탕 ── */
+.sm-button, .sm-primary, .sm-quiet {
+  display: inline-flex; align-items: center; justify-content: center; gap: 7px;
+  min-height: 44px; padding: 8px 14px; border-radius: 2px;
+  font-size: 14px; font-weight: 650; line-height: 1.4;
+  transition: background 0.14s, border-color 0.14s;
+}
+.sm-button { border: 1px solid var(--sm-line); background: transparent; }
+.sm-button:hover { background: var(--sm-soft); border-color: var(--sm-edge); }
+.sm-primary { border: 1px solid var(--sm-ink); background: var(--sm-ink); color: var(--sm-paper); }
+.sm-primary:hover { background: color-mix(in srgb, var(--sm-ink) 86%, var(--sm-paper)); }
+.sm-quiet { border: 0; background: transparent; min-width: 44px; padding: 8px; color: var(--sm-muted); }
+.sm-quiet:hover { background: var(--sm-soft); color: var(--sm-ink); }
+.sm-button svg, .sm-primary svg, .sm-quiet svg { flex: 0 0 auto; display: block; }
+
+/* ── 교과 묶음: 번호 표식 · 교과 이름 · 수업 수, 그 아래 수업 카드 ── */
+.sm-groups { display: flex; flex-direction: column; gap: 26px; }
+.sm-group { display: flex; flex-direction: column; gap: 12px; }
+.sm-group-head {
+  margin: 0; display: flex; align-items: center; gap: 12px; min-height: 44px;
+  padding-bottom: 8px; border-bottom: 1px solid var(--sm-line);
+  font-size: 18px; font-weight: 750; line-height: 1.4; letter-spacing: -0.02em;
+}
+.sm-badge {
+  flex: 0 0 auto; width: 34px; height: 30px; display: inline-flex; align-items: center; justify-content: center;
+  border: 1px solid var(--sm-accent); border-radius: 2px;
+  background: color-mix(in srgb, var(--sm-accent) 12%, var(--sm-paper)); color: var(--sm-accent);
+  font-family: var(--sm-mono); font-size: 13px; font-weight: 700; letter-spacing: 0.02em; font-variant-numeric: tabular-nums;
+}
+.sm-group-name { min-width: 0; }
+.sm-group-count { margin-left: auto; flex: 0 0 auto; color: var(--sm-muted); font-size: 13px; font-weight: 650; letter-spacing: 0; }
+
+/* 수업이 하나뿐인 교과는 한 줄을 다 쓰고, 둘 이상이면 넓은 화면에서 두 줄로 나눈다. */
+.sm-lessons { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 290px), 1fr)); gap: 12px; }
+.sm-lesson {
+  position: relative; min-width: 0;
+  display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: start; gap: 4px 6px;
+  padding: 14px 8px 14px 16px;
+  border: 1px solid var(--sm-line); border-radius: 2px; background: var(--sm-raised);
+}
+/* 왼쪽 위 모서리에 하늘빛 꺾쇠(시뮬레이션 교육 책의 계기판 모서리). */
+.sm-lesson::before {
+  content: ""; position: absolute; inset: -1px; pointer-events: none;
+  background:
+    linear-gradient(var(--sm-accent), var(--sm-accent)) left top / 14px 2px no-repeat,
+    linear-gradient(var(--sm-accent), var(--sm-accent)) left top / 2px 14px no-repeat;
+}
+.sm-lesson.is-editing { grid-column: 1 / -1; display: block; padding: 0; border: 0; background: transparent; }
+.sm-lesson.is-editing::before { display: none; }
+.sm-lesson-main { min-width: 0; display: flex; flex-direction: column; gap: 8px; padding-top: 2px; }
+.sm-lesson-title { margin: 0; font-size: 17px; font-weight: 750; line-height: 1.45; letter-spacing: -0.015em; }
+.sm-tags { margin: 0; display: flex; flex-wrap: wrap; gap: 6px; }
+.sm-tag {
+  display: inline-flex; align-items: center; gap: 5px; max-width: 100%;
+  padding: 2px 8px; border: 1px solid var(--sm-line); border-radius: 2px;
+  color: var(--sm-muted); font-size: 13px; font-weight: 650; line-height: 1.5;
+}
+.sm-tag.is-app { color: var(--sm-accent); border-color: color-mix(in srgb, var(--sm-accent) 45%, var(--sm-line)); }
+.sm-tag svg { flex: 0 0 auto; display: block; }
+.sm-flow { margin: 0; display: flex; align-items: flex-start; gap: 8px; font-size: 15px; line-height: 1.65; }
+.sm-flow svg { flex: 0 0 auto; display: block; margin-top: 4px; color: var(--sm-muted); }
+.sm-flow span { min-width: 0; }
+.sm-lesson-actions { display: flex; gap: 2px; }
+.sm-lesson-actions.is-confirming {
+  grid-column: 1 / -1; flex-wrap: wrap; align-items: center; justify-content: flex-end; gap: 8px;
+  margin-top: 8px; padding: 10px 0 0; border-top: 1px solid var(--sm-line);
+}
+.sm-confirm-text { margin: 0 auto 0 0; font-size: 14px; font-weight: 650; }
+
+/* ── 아무것도 없을 때 ── */
+.sm-empty {
+  display: flex; flex-direction: column; align-items: flex-start; gap: 6px;
+  padding: 22px 20px; border: 1px dashed var(--sm-edge); border-radius: 2px; color: var(--sm-muted);
+}
+.sm-empty-mark { display: block; width: 44px; height: 44px; margin-bottom: 4px; color: var(--sm-muted); }
+.sm-empty-mark .sm-diagram-dot { color: var(--sm-accent); fill: var(--sm-accent); }
+.sm-empty-title { margin: 0; color: var(--sm-ink); font-size: 16px; font-weight: 700; }
+.sm-empty-note { margin: 0; font-size: 15px; }
+
+/* ── 더하기 · 고치기 칸 ── */
+.sm-editor {
+  display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 16px;
+  padding: 16px; border: 1px solid var(--sm-edge); border-radius: 2px; background: var(--sm-soft);
+}
+.sm-editor-title { grid-column: 1 / -1; margin: 0; font-size: 15px; font-weight: 750; }
+.sm-field { display: flex; flex-direction: column; gap: 6px; min-width: 0; font-size: 14px; font-weight: 650; }
+.sm-field.is-wide { grid-column: 1 / -1; }
+.sm-field input, .sm-field select, .sm-field textarea {
+  width: 100%; min-height: 44px; padding: 9px 12px;
+  border: 1px solid var(--sm-line); border-radius: 2px; background: var(--sm-paper);
+  font-size: 16px; font-weight: 400;
+}
+.sm-field input::placeholder, .sm-field textarea::placeholder { color: var(--sm-muted); opacity: 0.85; }
+.sm-field textarea { resize: vertical; line-height: 1.6; }
+.sm-editor-actions { grid-column: 1 / -1; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+
+@media (max-width: 560px) {
+  .sm-head { padding: 18px 16px 16px; }
+  .sm-title { font-size: 24px; }
+  .sm-diagram { width: 128px; height: 128px; top: -40px; right: -44px; opacity: 0.14; }
+  .sm-group-head { font-size: 17px; gap: 10px; }
+  .sm-editor { grid-template-columns: minmax(0, 1fr); padding: 14px; }
+  .sm-head-foot .sm-primary { flex: 1 1 auto; }
+}
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition: none !important; animation: none !important; }
+}

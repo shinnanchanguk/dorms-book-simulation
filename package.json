@@ -1,0 +1,15 @@
+{
+  "name": "dorms-book-simulation",
+  "private": true,
+  "version": "0.1.0",
+  "description": "도름스 시뮬레이션 교육 책의 '선생님 칸' 화면 (도름스 책 SDK 시작 틀)",
+  "license": "MIT",
+  "scripts": {
+    "dev": "node scripts/serve.mjs",
+    "check": "node scripts/check.mjs",
+    "status": "node scripts/dorms.mjs status"
+  },
+  "engines": {
+    "node": ">=18"
+  }
+}
