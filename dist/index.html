@@ -3,14 +3,24 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1" />
-    <title>시뮬레이션 수업 모음</title>
+    <title>시뮬레이션 서재</title>
     <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="lessons.css" />
   </head>
   <body>
-    <main id="studio" class="sm-page"><p class="sm-state">수업 모음을 펼치고 있어요.</p></main>
+    <div class="wrap" id="studio">
+      <header class="top">
+        <div class="lamps" aria-hidden="true" id="lamps"></div>
+        <div class="sign"><h1>시뮬레이션 서재</h1><p>단원마다 꽂아 둔 시뮬레이터와 학습지</p></div>
+        <nav class="crumbs" id="crumbs" aria-label="지금 있는 곳"></nav>
+      </header>
+      <div class="toolbar" id="toolbar"></div>
+      <main id="app"><p class="state">서재를 펼치고 있어요.</p></main>
+    </div>
     <script src="dorms-book-sdk.js"></script>
+    <script src="main.js"></script>
     <script src="palette.js"></script>
     <script src="fit.js"></script>
-    <script src="main.js"></script>
+    <script src="lessons.js"></script>
   </body>
 </html>
